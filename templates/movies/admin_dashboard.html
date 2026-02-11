@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { background-color: #f4f6f8; }
+        .card { border-radius: 15px; }
+        .highlight-card {
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            color: white;
+        }
+        .filter-btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🎬 Admin Dashboard</h2>
+
+        <div class="btn-group">
+            <a href="?filter=all" class="btn btn-outline-primary filter-btn {% if current_filter == 'all' %}active{% endif %}">All</a>
+            <a href="?filter=today" class="btn btn-outline-primary filter-btn {% if current_filter == 'today' %}active{% endif %}">Today</a>
+            <a href="?filter=last7days" class="btn btn-outline-primary filter-btn {% if current_filter == 'last7days' %}active{% endif %}">Last 7 Days</a>
+        </div>
+    </div>
+
+    <!-- TOP CARDS -->
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>💰 Total Revenue</h5>
+                <h3 class="text-success">₹ {{ total_revenue }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>🎟️ Total Movies</h5>
+                <h3 class="text-primary">{{ popular_movies|length }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>🏢 Total Theaters</h5>
+                <h3 class="text-warning">{{ busiest_theaters|length }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card highlight-card shadow-sm text-center p-3">
+                <h5>🔥 Top Theater</h5>
+                {% if busiest_theaters %}
+                    <h6>{{ busiest_theaters.0.theater__name }}</h6>
+                    <small>{{ busiest_theaters.0.total_bookings }} bookings</small>
+                {% else %}
+                    <small>No Data</small>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+    <div class="card shadow-sm mb-4 p-4">
+        <h5>🎥 Movie Bookings</h5>
+        <canvas id="movieChart"></canvas>
+    </div>
+
+    <div class="card shadow-sm mb-4 p-4">
+        <h5>🏢 Theater Bookings</h5>
+        <canvas id="theaterChart"></canvas>
+    </div>
+
+    <div class="card shadow-sm mb-4 p-4">
+        <h5>📅 Date-wise Bookings</h5>
+        <canvas id="dailyChart"></canvas>
+    </div>
+
+    <!-- TABLES BACK -->
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3">
+                <h5>🎬 Movie Booking Table</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Movie</th>
+                            <th>Bookings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in popular_movies %}
+                        <tr>
+                            <td>{{ m.movie__name }}</td>
+                            <td>{{ m.total_bookings }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2">No Data</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3">
+                <h5>🏢 Theater Booking Table</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Theater</th>
+                            <th>Bookings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in busiest_theaters %}
+                        <tr>
+                            <td>{{ t.theater__name }}</td>
+                            <td>{{ t.total_bookings }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2">No Data</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const animationConfig = {
+    animation: {
+        duration: 1500,
+        easing: 'easeOutBounce'
+    }
+};
+
+new Chart(document.getElementById('movieChart'), {
+    type: 'bar',
+    data: {
+        labels: [{% for m in popular_movies %}"{{ m.movie__name }}",{% endfor %}],
+        datasets: [{
+            label: 'Bookings',
+            data: [{% for m in popular_movies %}{{ m.total_bookings }},{% endfor %}],
+            backgroundColor: '#4e73df'
+        }]
+    },
+    options: animationConfig
+});
+
+new Chart(document.getElementById('theaterChart'), {
+    type: 'bar',
+    data: {
+        labels: [{% for t in busiest_theaters %}"{{ t.theater__name }}",{% endfor %}],
+        datasets: [{
+            label: 'Bookings',
+            data: [{% for t in busiest_theaters %}{{ t.total_bookings }},{% endfor %}],
+            backgroundColor: '#f6c23e'
+        }]
+    },
+    options: animationConfig
+});
+
+new Chart(document.getElementById('dailyChart'), {
+    type: 'line',
+    data: {
+        labels: [{% for d in daily_bookings %}"{{ d.date }}",{% endfor %}],
+        datasets: [{
+            label: 'Daily Bookings',
+            data: [{% for d in daily_bookings %}{{ d.total }},{% endfor %}],
+            borderColor: '#1cc88a',
+            backgroundColor: 'rgba(28,200,138,0.2)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: animationConfig
+});
+</script>
+
+</body>
+</html>

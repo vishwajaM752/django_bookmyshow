@@ -10,4 +10,6 @@ urlpatterns = [
     path('payment-success/', payment_success, name='payment_success'),
     path('payment-cancel/<int:theater_id>/',views.payment_cancel,name='payment_cancel'),
 
+    # ✅ ADMIN DASHBOARD (THIS TASK)
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]

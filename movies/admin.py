@@ -4,9 +4,8 @@ from .models import Movie, Theater, Seat, Booking
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ['name', 'rating', 'cast', 'image', 'description', 'trailer_url']  # added image
-    fields = ['name', 'rating', 'cast', 'image', 'description', 'trailer_url']       # added image
-
+    list_display = ['name', 'rating', 'genre', 'language', 'price']
+    fields = ['name', 'rating', 'genre', 'language', 'price', 'cast', 'image', 'description', 'trailer_url']
 
 
 @admin.register(Theater)
@@ -21,4 +20,4 @@ class SeatAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ['user', 'seat', 'movie', 'theater', 'booked_at']
+    list_display = ['user', 'movie', 'theater', 'seat', 'total_amount', 'payment_status', 'booked_at']

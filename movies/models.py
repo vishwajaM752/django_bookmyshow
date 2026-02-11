@@ -15,7 +15,8 @@ class Movie(models.Model):
     # 🔹 Added for Task 1 (Filters)
     genre = models.CharField(max_length=100, default="Action")
     language = models.CharField(max_length=100, default="Hindi")
-
+    
+    price = models.IntegerField(default=200)  # ✅ ADD THIS
 
     def __str__(self):
         return self.name
@@ -52,7 +53,7 @@ class Booking(models.Model):
     seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
-
+    total_amount = models.IntegerField(default=0)  # ✅ ADD THIS
     payment_status = models.CharField(max_length=20, default="PENDING")  # ⭐ matches DB
     booked_at = models.DateTimeField(auto_now_add=True)
 
