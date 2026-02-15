@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 from dotenv import load_dotenv
+load_dotenv()
+
 from pathlib import Path
 import os
 import dj_database_url
@@ -140,3 +142,7 @@ EMAIL_HOST_USER = 'vishwajamandhare77@gmail.com'
 EMAIL_HOST_PASSWORD = 'hbli abqn gpsn admv'
 
 # add keys from env file here
+import os
+
+STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
